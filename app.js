@@ -4,6 +4,8 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+const rapid_api = require('./utils/request')
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
@@ -21,6 +23,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+
+app.use('/api/:url', async (req,res) => {
+  try {
+    const data = await rapid_api(req.params.url)
+    res.json(data)  
+  } catch (error) {
+    console.error(error.message);
+    res.status(404).send("failed to fetch!")
+  }
+})
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
